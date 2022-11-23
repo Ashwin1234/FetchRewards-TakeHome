@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fetch_rewards/controllers"
+	"fetch_rewards/models"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -22,7 +23,7 @@ func TestAddTransaction(t *testing.T) {
 
 	r := SetUpRouter()
 	r.POST("/add_transactions", controllers.AddTransactions)
-	transaction := controllers.Transaction{
+	transaction := models.Transaction{
 		Payer:     "DANNON",
 		Points:    1000,
 		Timestamp: "2022-11-02T14:00:00Z",
@@ -41,7 +42,7 @@ func TestGetSpendPoints(t *testing.T) {
 	r := SetUpRouter()
 	r.GET("/spend_points", controllers.GetSpendPoints)
 
-	spendPoints := controllers.SpendPoints{
+	spendPoints := models.SpendPoints{
 		Points: 5000,
 	}
 

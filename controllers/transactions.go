@@ -6,29 +6,16 @@ import (
 	"net/http"
 	"sort"
 
+	"fetch_rewards/models"
+
 	"github.com/gin-gonic/gin"
 )
 
-var transactions []Transaction
+var transactions []models.Transaction
 var spend = make(map[string]int)
 var balance = make(map[string]int)
 
 /* struct initializations */
-
-type Transaction struct {
-	Payer     string `json:"payer" binding:"required"`
-	Points    int    `json:"points" binding:"required"`
-	Timestamp string `json:"timestamp" binding:"required"`
-}
-
-type SpendPoints struct {
-	Points int `json:"points" binding:"required"`
-}
-
-type PointsSpent struct {
-	Payer  string `json:"payer"`
-	Points int    `json:"points"`
-}
 
 func UpdatePointBalance() {
 
@@ -47,7 +34,7 @@ func UpdatePointBalance() {
 
 /* Service to add transactions */
 func AddTransactions(c *gin.Context) {
-	var transaction Transaction
+	var transaction models.Transaction
 	if err := c.BindJSON(&transaction); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": " Transaction request should be of specified format "})
 		return
@@ -66,9 +53,9 @@ func GetSpendPoints(c *gin.Context) {
 
 	var total = 0
 
-	var spentList []PointsSpent
+	var spentList []models.PointsSpent
 
-	var spendPoints SpendPoints
+	var spendPoints models.SpendPoints
 
 	if err := c.BindJSON(&spendPoints); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Spend point request should be of specified format"})
@@ -123,11 +110,11 @@ func GetSpendPoints(c *gin.Context) {
 	}
 
 	for key, value := range spendMap {
-		u, err := json.Marshal(PointsSpent{Payer: key, Points: value})
+		u, err := json.Marshal(models.PointsSpent{Payer: key, Points: value})
 		if err != nil {
 			fmt.Println(err)
 		}
-		var jsonMap PointsSpent
+		var jsonMap models.PointsSpent
 		json.Unmarshal([]byte(u), &jsonMap)
 		spentList = append(spentList, jsonMap)
 	}
