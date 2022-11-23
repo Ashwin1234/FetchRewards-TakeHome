@@ -15,8 +15,6 @@ var transactions []models.Transaction
 var spend = make(map[string]int)
 var balance = make(map[string]int)
 
-/* struct initializations */
-
 func UpdatePointBalance() {
 
 	balance = make(map[string]int)
@@ -32,6 +30,15 @@ func UpdatePointBalance() {
 	fmt.Println(balance)
 }
 
+func getTotalPoints() int {
+	var total = 0
+	for _, value := range balance {
+		total = total + value
+	}
+
+	return total
+}
+
 /* Service to add transactions */
 func AddTransactions(c *gin.Context) {
 	var transaction models.Transaction
@@ -43,13 +50,15 @@ func AddTransactions(c *gin.Context) {
 	transactions = append(transactions, transaction)
 	c.JSON(http.StatusCreated, gin.H{"data": transaction})
 
+	UpdatePointBalance()
+
 }
 
 /* Service to get the points spent by each payer */
 
 func GetSpendPoints(c *gin.Context) {
 
-	UpdatePointBalance()
+	var remainingPoints = getTotalPoints()
 
 	var total = 0
 
@@ -67,7 +76,12 @@ func GetSpendPoints(c *gin.Context) {
 	var spendMap = make(map[string]int)
 
 	if spend < 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Spend point cannot be negative"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Spend points cannot be negative"})
+		return
+	}
+
+	if spend > remainingPoints {
+		c.JSON(http.StatusBadRequest, gin.H{"error": " Spend points cannot be more than balance"})
 		return
 	}
 
@@ -75,10 +89,23 @@ func GetSpendPoints(c *gin.Context) {
 		return transactions[i].Timestamp < transactions[j].Timestamp
 	})
 
+	fmt.Println(spend)
+
 	for _, transaction := range transactions {
 
 		if total < spend {
 			if total+transaction.Points <= spend {
+				if balance[transaction.Payer] < transaction.Points {
+					total = total + balance[transaction.Payer]
+					if val, ok := spendMap[transaction.Payer]; ok {
+						spendMap[transaction.Payer] = val - balance[transaction.Payer]
+					} else {
+						spendMap[transaction.Payer] = -balance[transaction.Payer]
+					}
+					balance[transaction.Payer] = 0
+					continue
+				}
+
 				total = total + transaction.Points
 
 				if val, ok := spendMap[transaction.Payer]; ok {
@@ -89,6 +116,17 @@ func GetSpendPoints(c *gin.Context) {
 				balance[transaction.Payer] = balance[transaction.Payer] - transaction.Points
 
 			} else {
+
+				if balance[transaction.Payer] < (spend - total) {
+					total = balance[transaction.Payer]
+					if val, ok := spendMap[transaction.Payer]; ok {
+						spendMap[transaction.Payer] = val - balance[transaction.Payer]
+					} else {
+						spendMap[transaction.Payer] = -balance[transaction.Payer]
+					}
+					balance[transaction.Payer] = 0
+					continue
+				}
 
 				if val, ok := spendMap[transaction.Payer]; ok {
 					spendMap[transaction.Payer] = val - (spend - total)
@@ -102,11 +140,6 @@ func GetSpendPoints(c *gin.Context) {
 		} else {
 			break
 		}
-	}
-
-	if total < spend {
-		c.JSON(http.StatusOK, gin.H{"error": "Insufficient balance"})
-		return
 	}
 
 	for key, value := range spendMap {
