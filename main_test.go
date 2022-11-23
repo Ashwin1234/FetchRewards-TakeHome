@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fetch_rewards/controllers"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -20,8 +21,8 @@ func SetUpRouter() *gin.Engine {
 func TestAddTransaction(t *testing.T) {
 
 	r := SetUpRouter()
-	r.POST("/add_transactions", addTransactions)
-	transaction := Transaction{
+	r.POST("/add_transactions", controllers.AddTransactions)
+	transaction := controllers.Transaction{
 		Payer:     "DANNON",
 		Points:    1000,
 		Timestamp: "2022-11-02T14:00:00Z",
@@ -38,9 +39,9 @@ func TestAddTransaction(t *testing.T) {
 func TestGetSpendPoints(t *testing.T) {
 
 	r := SetUpRouter()
-	r.GET("/spend_points", getSpendPoints)
+	r.GET("/spend_points", controllers.GetSpendPoints)
 
-	spendPoints := SpendPoints{
+	spendPoints := controllers.SpendPoints{
 		Points: 5000,
 	}
 
@@ -60,7 +61,7 @@ func TestGetSpendPoints(t *testing.T) {
 func TestGetPointBalance(t *testing.T) {
 
 	r := SetUpRouter()
-	r.GET("/point_balances", getPointBalances)
+	r.GET("/point_balances", controllers.GetPointBalances)
 
 	req, _ := http.NewRequest("GET", "/point_balances", nil)
 

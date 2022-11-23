@@ -30,7 +30,7 @@ type PointsSpent struct {
 	Points int    `json:"points"`
 }
 
-func updatePointBalance() {
+func UpdatePointBalance() {
 
 	balance = make(map[string]int)
 
@@ -46,7 +46,7 @@ func updatePointBalance() {
 }
 
 /* Service to add transactions */
-func addTransactions(c *gin.Context) {
+func AddTransactions(c *gin.Context) {
 	var transaction Transaction
 	if err := c.BindJSON(&transaction); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": " Transaction request should be of specified format "})
@@ -60,9 +60,9 @@ func addTransactions(c *gin.Context) {
 
 /* Service to get the points spent by each payer */
 
-func getSpendPoints(c *gin.Context) {
+func GetSpendPoints(c *gin.Context) {
 
-	updatePointBalance()
+	UpdatePointBalance()
 
 	var total = 0
 
@@ -134,4 +134,12 @@ func getSpendPoints(c *gin.Context) {
 
 	c.JSON(http.StatusOK, spentList)
 
+}
+
+/* Service to get balance of each payer */
+
+func GetPointBalances(c *gin.Context) {
+
+	c.JSON(http.StatusOK, balance)
+	return
 }
