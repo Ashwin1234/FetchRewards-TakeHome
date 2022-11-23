@@ -24,6 +24,8 @@ func main() {
 
 }
 
+/* struct initializations */
+
 type Transaction struct {
 	Payer     string `json:"payer" binding:"required"`
 	Points    int    `json:"points" binding:"required"`
@@ -39,6 +41,22 @@ type PointsSpent struct {
 	Points int    `json:"points"`
 }
 
+func updatePointBalance() {
+
+	balance = make(map[string]int)
+
+	for _, transaction := range transactions {
+		if val, ok := balance[transaction.Payer]; ok {
+			balance[transaction.Payer] = val + transaction.Points
+		} else {
+			balance[transaction.Payer] = transaction.Points
+		}
+	}
+
+	fmt.Println(balance)
+}
+
+/* Service to add transactions */
 func addTransactions(c *gin.Context) {
 	var transaction Transaction
 	if err := c.BindJSON(&transaction); err != nil {
@@ -47,78 +65,19 @@ func addTransactions(c *gin.Context) {
 	}
 
 	transactions = append(transactions, transaction)
-	if val, ok := balance[transaction.Payer]; ok {
-		balance[transaction.Payer] = val + transaction.Points
-	} else {
-		balance[transaction.Payer] = transaction.Points
-	}
-	c.JSON(http.StatusOK, gin.H{"data": transaction})
+	c.JSON(http.StatusCreated, gin.H{"data": transaction})
 
 }
 
+/* Service to get the points spent by each payer */
+
 func getSpendPoints(c *gin.Context) {
 
-	/*(var balance = make(map[string]int)
-
-	var spendMap = make(map[string]int)
-
-	var tempTransactions = transactions
-
-	var spendPoints SpendPoints
-
-	var pointsSpent []string
-
-	if err := c.BindJSON(&spendPoints); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
-
-	var points_to_spend int = spendPoints.Points
-
-	sort.Slice(tempTransactions, func(i, j int) bool {
-		return tempTransactions[i].Timestamp < tempTransactions[j].Timestamp
-	})
-
-	for _, value := range tempTransactions {
-		if value.Points > 0 {
-			var pointsForPayer = 0
-			for _, value1 := range tempTransactions {
-				if value1.Payer == value.Payer {
-					if value1.Points < 0 {
-						pointsForPayer = pointsForPayer + value.Points - value1.Points
-					}
-				}
-			}
-			if pointsForPayer > 0 {
-				if points_to_spend-pointsForPayer > 0 {
-					spendMap[value.Payer] = spendMap[value.Payer] - pointsForPayer
-					points_to_spend = points_to_spend - pointsForPayer
-				} else {
-					spendMap[value.Payer] = spendMap[value.Payer] - points_to_spend
-					points_to_spend = 0
-				}
-
-			}
-		}
-	}
-
-	for key, _ := range spendMap {
-		balance[key] = balance[key] - spendMap[key]
-	}
-
-	for key, value := range spendMap {
-		payerValue := &PointsSpent{
-			Key:   key,
-			Value: value,
-		}
-		data, _ := json.Marshal(payerValue)
-		pointsSpent = append(pointsSpent, string(data))
-	}
-
-	spend = balance */
+	updatePointBalance()
 
 	var total = 0
 
-	var spentList []string
+	var spentList []PointsSpent
 
 	var spendPoints SpendPoints
 
@@ -161,6 +120,7 @@ func getSpendPoints(c *gin.Context) {
 					spendMap[transaction.Payer] = -(spend - total)
 				}
 				balance[transaction.Payer] = balance[transaction.Payer] - (spend - total)
+				total = spend
 				break
 			}
 		} else {
@@ -168,20 +128,29 @@ func getSpendPoints(c *gin.Context) {
 		}
 	}
 
+	if total < spend {
+		c.JSON(http.StatusOK, gin.H{"error": "Insufficient balance"})
+		return
+	}
+
 	for key, value := range spendMap {
 		u, err := json.Marshal(PointsSpent{Payer: key, Points: value})
 		if err != nil {
 			fmt.Println(err)
 		}
-		fmt.Println(string(u))
-		spentList = append(spentList, string(u))
+		var jsonMap PointsSpent
+		json.Unmarshal([]byte(u), &jsonMap)
+		spentList = append(spentList, jsonMap)
 	}
 
-	c.JSON(http.StatusOK, spendMap)
+	c.JSON(http.StatusOK, spentList)
 
 }
+
+/* Service to get balance of each payer */
 
 func getPointBalances(c *gin.Context) {
 
 	c.JSON(http.StatusOK, balance)
+	return
 }
