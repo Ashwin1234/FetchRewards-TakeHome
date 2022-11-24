@@ -19,16 +19,16 @@ Check the go version with ``` go version ```
 Check if gopath is set up correctly.
 
 ### Steps to install project
-``` $ git clone https://github.com/Ashwin1234/FetchRewards-Takehome
-$ go mod download ```
+``` $ git clone https://github.com/Ashwin1234/FetchRewards-Takehome ```
+``` $ go mod download ```
 This clones the project and installs all the dependencies.
 
 ### Steps to run the project
 ``` $ go run main.go ```
 
 ### Steps to run the project using docker
-``` $ docker build . -t fetchrewards
-$ docker run -d -p 8080:8080 fetchrewards ```
+``` $ docker build . -t fetchrewards ```
+``` $ docker run -d -p 8080:8080 fetchrewards ```
 This first creates a docker image fetchrewards, and then runs the image in the container in port 8080.
 
 The project should now be running in - [localhost:8080](http://localhost:8080)
