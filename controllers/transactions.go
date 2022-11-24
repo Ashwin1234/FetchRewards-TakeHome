@@ -30,6 +30,8 @@ func UpdatePointBalance() {
 	fmt.Println(balance)
 }
 
+/* function to calculate the total points of all payers. */
+
 func getTotalPoints() int {
 	var total = 0
 	for _, value := range balance {
@@ -48,7 +50,7 @@ func AddTransactions(c *gin.Context) {
 	}
 
 	transactions = append(transactions, transaction)
-	c.JSON(http.StatusCreated, gin.H{"data": transaction})
+	c.JSON(http.StatusCreated, gin.H{"success": "transaction added"})
 
 	UpdatePointBalance()
 
