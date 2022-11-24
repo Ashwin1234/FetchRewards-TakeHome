@@ -39,13 +39,13 @@ The project should now be running in - [localhost:8080](http://localhost:8080)
 
 The endpoint - [http://localhost:8080/add_transactions](http://localhost:8080/add_transactions) is a POST request which add transactions.
 the result is shown below.<br>
-![](./images/pic 2.png)
+![](./images/pic_2.png)
 
 The endpoint - [http://localhost:8080/spend_points](http://localhost:8080/spend_points) is a GET request which gives the points spent by each user.<br>
-![](./images/pic 3.png)
+![](./images/pic_3.png)
 
 The endpoint - [http://localhost:8080/point_balances](http://localhost:8080/point_balances) is a GET request which gives the point balances after the spent endpoint.<br>
-![](./images/pic 1.png)
+![](./images/pic_1.png)
 
 
 ### Running Tests
