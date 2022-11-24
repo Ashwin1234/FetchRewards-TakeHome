@@ -91,13 +91,14 @@ func GetSpendPoints(c *gin.Context) {
 		return transactions[i].Timestamp < transactions[j].Timestamp
 	})
 
-	fmt.Println(spend)
-
 	for _, transaction := range transactions {
 
 		if total < spend {
-			if total+transaction.Points <= spend {
+
+			if total+transaction.Points <= spend || total+balance[transaction.Payer] <= spend {
+
 				if balance[transaction.Payer] < transaction.Points {
+
 					total = total + balance[transaction.Payer]
 					if val, ok := spendMap[transaction.Payer]; ok {
 						spendMap[transaction.Payer] = val - balance[transaction.Payer]
@@ -105,21 +106,23 @@ func GetSpendPoints(c *gin.Context) {
 						spendMap[transaction.Payer] = -balance[transaction.Payer]
 					}
 					balance[transaction.Payer] = 0
-					continue
-				}
 
-				total = total + transaction.Points
-
-				if val, ok := spendMap[transaction.Payer]; ok {
-					spendMap[transaction.Payer] = val - transaction.Points
 				} else {
-					spendMap[transaction.Payer] = -transaction.Points
+
+					total = total + transaction.Points
+
+					if val, ok := spendMap[transaction.Payer]; ok {
+						spendMap[transaction.Payer] = val - transaction.Points
+					} else {
+						spendMap[transaction.Payer] = -transaction.Points
+					}
+					balance[transaction.Payer] = balance[transaction.Payer] - transaction.Points
 				}
-				balance[transaction.Payer] = balance[transaction.Payer] - transaction.Points
 
 			} else {
 
 				if balance[transaction.Payer] < (spend - total) {
+
 					total = balance[transaction.Payer]
 					if val, ok := spendMap[transaction.Payer]; ok {
 						spendMap[transaction.Payer] = val - balance[transaction.Payer]
@@ -127,18 +130,20 @@ func GetSpendPoints(c *gin.Context) {
 						spendMap[transaction.Payer] = -balance[transaction.Payer]
 					}
 					balance[transaction.Payer] = 0
-					continue
-				}
 
-				if val, ok := spendMap[transaction.Payer]; ok {
-					spendMap[transaction.Payer] = val - (spend - total)
 				} else {
-					spendMap[transaction.Payer] = -(spend - total)
+
+					if val, ok := spendMap[transaction.Payer]; ok {
+						spendMap[transaction.Payer] = val - (spend - total)
+					} else {
+						spendMap[transaction.Payer] = -(spend - total)
+					}
+					balance[transaction.Payer] = balance[transaction.Payer] - (spend - total)
+					total = spend
+					break
 				}
-				balance[transaction.Payer] = balance[transaction.Payer] - (spend - total)
-				total = spend
-				break
 			}
+
 		} else {
 			break
 		}

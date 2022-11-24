@@ -43,7 +43,7 @@ func TestGetSpendPoints(t *testing.T) {
 	r.GET("/spend_points", controllers.GetSpendPoints)
 
 	spendPoints := models.SpendPoints{
-		Points: 5000,
+		Points: -1,
 	}
 
 	jsonValue, _ := json.Marshal(spendPoints)
