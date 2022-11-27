@@ -9,22 +9,22 @@ Return all payer point balances. <br>
 
 ## Installations : <br>
 ### Install Go in MacOS
-$ brew update
-$ brew install golang
+``` $ brew update ``` <br>
+``` $ brew install golang ``` <br>
 This installs golang locally in your system.
 
 ### Install Go in Windows OS
-Go to - [link](https://go.dev/) and download Golang.
-Check the go version with ``` go version ```
-Check if gopath is set up correctly.
+Go to - [link](https://go.dev/) and download Golang. <br>
+Check the go version with ``` go version ```. <br>
+Check if gopath is set up correctly. <br>
 
 ### Steps to install project
 ``` $ git clone https://github.com/Ashwin1234/FetchRewards-Takehome ``` <br>
 ``` $ go mod download ``` <br>
-This clones the project and installs all the dependencies.
+This clones the project and installs all the dependencies. <br>
 
 ## Steps to run the project
-``` $ go run main.go ```
+``` $ go run main.go ``` <br>
 
 ## Steps to run the project using docker
 ``` $ docker build . -t fetchrewards ``` <br>
