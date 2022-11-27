@@ -24,9 +24,11 @@ Check if gopath is set up correctly. <br>
 This clones the project and installs all the dependencies. <br>
 
 ## Steps to run the project
+To run the project use the follwing command in the project directory. <br>
 ``` $ go run main.go ``` <br>
 
 ## Steps to run the project using docker
+To run the project using docker use the following command in the project directory. <br>
 ``` $ docker build . -t fetchrewards ``` <br>
 ``` $ docker run -d -p 8080:8080 fetchrewards ``` <br>
 This first creates a docker image fetchrewards, and then runs the image in the container in port 8080.
