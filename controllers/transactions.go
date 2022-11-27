@@ -11,15 +11,39 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var transactions []models.Transaction
+var input []models.Transaction
 var spend = make(map[string]int)
 var balance = make(map[string]int)
+var transactions []models.Transaction
+
+/* func to update transaction based on timestamp */
+func UpdateTransaction() {
+	transactions = nil
+	sort.Slice(input, func(i, j int) bool {
+		return input[i].Timestamp < input[j].Timestamp
+	})
+
+	for i := 0; i < len(input); i++ {
+		if input[i].Points > 0 {
+			transactions = append(transactions, input[i])
+		}
+	}
+
+	for i := len(input) - 1; i >= 0; i-- {
+		if input[i].Points < 0 {
+			transactions = append([]models.Transaction{input[i]}, transactions...)
+		}
+	}
+
+}
+
+/* func to update point balance */
 
 func UpdatePointBalance() {
 
 	balance = make(map[string]int)
 
-	for _, transaction := range transactions {
+	for _, transaction := range input {
 		if val, ok := balance[transaction.Payer]; ok {
 			balance[transaction.Payer] = val + transaction.Points
 		} else {
@@ -27,7 +51,6 @@ func UpdatePointBalance() {
 		}
 	}
 
-	fmt.Println(balance)
 }
 
 /* function to calculate the total points of all payers. */
@@ -49,7 +72,7 @@ func AddTransactions(c *gin.Context) {
 		return
 	}
 
-	transactions = append(transactions, transaction)
+	input = append(input, transaction)
 	c.JSON(http.StatusCreated, gin.H{"success": "transaction added"})
 
 	UpdatePointBalance()
@@ -87,9 +110,7 @@ func GetSpendPoints(c *gin.Context) {
 		return
 	}
 
-	sort.Slice(transactions, func(i, j int) bool {
-		return transactions[i].Timestamp < transactions[j].Timestamp
-	})
+	UpdateTransaction()
 
 	for _, transaction := range transactions {
 
@@ -108,7 +129,6 @@ func GetSpendPoints(c *gin.Context) {
 					balance[transaction.Payer] = 0
 
 				} else {
-
 					total = total + transaction.Points
 
 					if val, ok := spendMap[transaction.Payer]; ok {
