@@ -16,7 +16,7 @@ This installs golang locally in your system.
 ### Install Go in Windows OS
 Go to - [link](https://go.dev/) and download Golang. <br>
 Check the go version with ``` go version ```. <br>
-Check if gopath is set up correctly. <br>
+Check if gopath is set up correctly - [link](https://www.golinuxcloud.com/install-golang-on-windows/) <br>
 
 ### Steps to install project
 ``` $ git clone https://github.com/Ashwin1234/FetchRewards-Takehome ``` <br>
